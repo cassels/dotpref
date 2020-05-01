@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "target": "ES5",
+    "lib": ["ES5", "ES6"],
+    "noUnusedLocals": false,
+    "module": "CommonJS",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "moduleResolution": "Node",
+    "rootDir": "src",
+    "outDir": "lib"
+  },
+  "include": ["./src/**/*.tsx", "./src/**/*.ts"],
+  "exclude": [
+    "lib",
+    "node_modules",
+    "**/__*__/**",
+    "./src/**/*.spec.tsx",
+    "./src/**/*.spec.ts"
+  ]
+}

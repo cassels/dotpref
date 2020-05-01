@@ -1,0 +1,29 @@
+{
+  "name": "stateful-preferences",
+  "version": "1.0.0",
+  "description": "Manage CLI application encrypted preferences in a stateful way.",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watchAll --no-coverage",
+    "build": "yarn clean && tsc",
+    "build:watch": "tsc --watch ",
+    "clean": "rm -rf lib"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.2.1",
+    "@types/node": "^13.13.4",
+    "@typescript-eslint/eslint-plugin": "^2.30.0",
+    "@typescript-eslint/parser": "^2.30.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "jest": "^25.5.2",
+    "prettier": "^2.0.5",
+    "ts-jest": "^25.4.0",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {}
+}
