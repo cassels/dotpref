@@ -49,6 +49,11 @@ jobs:
         node: [ '6', '8', '10', '12' ]
     name: Integration Test on Node ${{ matrix.node }}
     steps:
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:   
+        node-version: ${{ matrix.node }}
+
     - name: Download lib
       uses: actions/download-artifact@v1
       with:
