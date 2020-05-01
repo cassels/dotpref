@@ -3,27 +3,56 @@
 name: CI
 
 on:
-  push:
-    branches: 
-      - master
-      - next
-      - beta
-      - release/*
-  pull_request:
-    branches:
-      - master
-      - next
-      - beta
-      - release/*
+ - push
 
 jobs:
-  test:
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-      with:
-        node-version: '12.x'
-    - run: yarn install --frozen-lockfile
-    - run: yarn test
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
 
+    - name: Cache node_modules
+      uses: actions/cache@v1
+      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+
+    - name: Install Dependencies
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      run: yarn install --frozen-lockfile
+    
+    - name: Unit Test
+      run: yarn test
+      
+    - name: Build 
+      run: yarn build
+    
+    - name: Upload 'lib' artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: lib
+        path: lib
+
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ '6', '8', '10', '12' ]
+    name: Integration Test on Node ${{ matrix.node }}
+    steps:
+    - name: Download lib
+      uses: actions/download-artifact@v1
+      with:
+        name: lib
+        
+    - run: ls lib
