@@ -1,6 +1,6 @@
 {
   "name": "stateful-preferences",
-  "version": "1.0.0",
+  "version": "0.0.0-development",
   "description": "Manage CLI application encrypted preferences in a stateful way.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -10,7 +10,8 @@
     "test:watch": "jest --watchAll --no-coverage",
     "build": "yarn clean && tsc",
     "build:watch": "tsc --watch ",
-    "clean": "rm -rf lib"
+    "clean": "rm -rf lib",
+    "semantic-release": "semantic-release --dry-run"
   },
   "devDependencies": {
     "@types/jest": "^25.2.1",
@@ -23,7 +24,12 @@
     "jest": "^25.5.2",
     "prettier": "^2.0.5",
     "ts-jest": "^25.4.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "semantic-release": "^17.0.7"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cassels/stateful-preferences.git"
+  }
 }
