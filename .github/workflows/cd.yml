@@ -1,0 +1,71 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - master
+      - next
+      - beta
+      - release/*
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+
+    - name: Cache node_modules
+      uses: actions/cache@v1
+      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+    - name: Install Dependencies
+      run: yarn install --frozen-lockfile
+    
+    - name: Unit Test
+      run: yarn test
+      
+    - name: Build 
+      run: yarn build
+    
+    - name: Upload 'lib' artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: lib
+        path: lib
+   
+  release:
+    name: Release
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+        
+      - name: Install dependencies
+        run: yarn install
+      
+      - name: Download lib
+        uses: actions/download-artifact@v1
+        with:
+          name: lib
+
+      - name: Release
+        run: yarn semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
