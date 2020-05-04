@@ -1,90 +1,117 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { homedir } from 'os';
-import { join } from 'path';
-import { AnyState, PreferenceObserver, PreferenceStore } from './types';
-import {
-  createCrypto,
-  CryptoConfig,
-  CRYPTO_DEFAULTS,
-  INPUT_ENCODING,
-} from './utils/crypto';
-import {
-  createSerializer,
-  SerializerConfig,
-  SERIALIZER_DEFAULTS,
-} from './utils/serializer';
-import { normalizeId } from './utils/utils';
+import { dirname, join } from 'path';
+import { AnyState, DotPrefOptions } from './types';
+import { existsOnDisk, readFromDisk, writeToDisk } from './utils/io';
+import { getOptions } from './utils/options';
+import { PartialPick } from './utils/types';
+import { getPackageData, normalizeId, shouldWrite } from './utils/utils';
 
-export const DEFAULT_PATH = join(homedir(), '.config', 'preferences');
+export * from './types';
+export { getDefaultCrypto } from './utils/crypto';
 
-export type CreatePreferencesOptions = {
-  dirPath: string;
-} & SerializerConfig &
-  CryptoConfig;
+/**
+ * Returns the directory of the caller by finding the directory of
+ * module.parent. To do this we need to prevent require from caching
+ * this module and suppress NodeJS warnings.
+ */
+const getModuleParentDir = () => {
+  const warn = console.warn;
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  console.warn = () => {};
+  delete require.cache[__filename];
+  console.warn = warn;
+  return dirname((module.parent && module.parent.filename) || '.');
+};
 
-export const getDefaults = (
-  options: Partial<CreatePreferencesOptions> = {}
-): CreatePreferencesOptions => ({
-  dirPath: DEFAULT_PATH,
-  ...CRYPTO_DEFAULTS,
-  ...SERIALIZER_DEFAULTS,
-  ...options,
+/**
+ * Default instance of .pref
+ */
+export const Pref = createInstance<AnyState>({
+  defaults: {},
 });
 
-export const createPreferences = <S extends AnyState>(
-  id: string,
-  defaults: S = {} as S,
-  options: Partial<CreatePreferencesOptions> = {}
-): PreferenceStore<S> => {
-  const { dirPath, keyPath, format } = getDefaults(options);
+/**
+ * Create custom instance of .pref.
+ */
+export function createInstance<S extends AnyState>({
+  name,
+  ...options
+}: PartialPick<DotPrefOptions<S>, 'defaults'>) {
+  const parentPackageData = getPackageData(getModuleParentDir());
+  const defaultName = parentPackageData.name;
 
-  let observers: PreferenceObserver[] = [];
+  const {
+    defaults,
+    filename,
+    dirPath,
+    serializer,
+    deserializer,
+    encoder,
+    decoder,
+    setter,
+    getter,
+    equality,
+  } = getOptions({ ...options, name: normalizeId(name || defaultName) });
 
-  const identifier = normalizeId(id);
+  // TODO: implement watch
+  let state: S;
 
-  const filePath = join(dirPath, identifier + '.pref');
+  const get = <K extends keyof S>(key: K): S[K] => getter(state, key);
 
-  const serializer = createSerializer<S>({
-    format,
-  });
-
-  const crypto = createCrypto({
-    keyPath,
-  });
-
-  const getPreferences = (): Readonly<Partial<S>> => {
-    try {
-      const encrypted = readFileSync(filePath, INPUT_ENCODING);
-      const text = crypto.decode(encrypted);
-      return serializer.deserialize(text);
-    } catch (e) {
-      return defaults;
+  const set = <K extends keyof S>(key: K, value: S[K]) => {
+    const oldState = state;
+    state = setter(state, key, value);
+    // TODO: notify SET.
+    if (shouldWrite(equality, oldState, state)) {
+      write();
     }
   };
 
-  const setPreferences = (preferences: Partial<S>) => {
-    const data = serializer.serialize(preferences);
-    const payload = crypto.encode(data);
-    mkdirSync(dirPath, { recursive: true, mode: parseInt('0700', 8) });
-    writeFileSync(filePath, payload, { mode: parseInt('0600', 8) });
-    notifyObservers();
+  const reset = <K extends keyof S>(key: K) => {
+    set(key, defaults[key]);
   };
 
-  const notifyObservers = () => {
-    observers.forEach(observer => observer(getPreferences()));
+  const read = () => {
+    if (existsOnDisk(dirPath, filename)) {
+      const encryptedData = readFromDisk(dirPath, filename);
+      const serializedData = decoder(encryptedData);
+      state = { ...defaults, ...deserializer(serializedData) };
+      // TODO: notify READ
+    } else {
+      state = { ...defaults };
+    }
   };
 
-  const subscribe = (observer: PreferenceObserver<S>) => {
-    const originalObservers = [...observers];
-    observers = [...originalObservers, observer];
-    return () => {
-      observers = [...originalObservers];
-    };
+  const write = () => {
+    const serializedData = serializer(state);
+    const encryptedData = encoder(serializedData);
+    writeToDisk(dirPath, filename, encryptedData);
+    // TODO: notify WRITE
   };
 
-  return {
-    getPreferences,
-    setPreferences,
-    subscribe,
+  // TODO: implement on
+  // const on = () => {};
+
+  // TODO: implement migrate
+  // const migrate = () => {};
+
+  const api = {
+    get,
+    set,
+    reset,
+    write,
+    read,
+    filePath: join(dirPath, filename),
+    // on,
+    // migrate,
   };
-};
+
+  Object.defineProperty(api, 'filePath', {
+    writable: false,
+    enumerable: true,
+    value: join(dirPath, filename),
+  });
+
+  read();
+
+  return api;
+}
