@@ -1,100 +1,219 @@
-import * as fs from 'fs';
-import {
-  createPreferences,
-  CreatePreferencesOptions,
-  DEFAULT_PATH,
-  getDefaults,
-} from './index';
-import { SSH_KEY_PATH } from './utils/crypto';
+import { join } from 'path';
+import { createInstance, Pref as Pref1 } from './index';
+import * as io from './utils/io';
 
-const SSH_MOCK_VALUE = 'SSH_MOCK_VALUE';
-
-const mockFS = () => {
-  let tmp: string = undefined;
-  jest.spyOn(fs, 'mkdirSync').mockImplementation(() => '');
-  jest.spyOn(fs, 'readFileSync').mockImplementation((path: string) => {
-    if (tmp) {
-      return tmp;
-    } else if (path === SSH_KEY_PATH) {
-      return SSH_MOCK_VALUE;
-    }
-    throw new Error();
-  });
-  jest
-    .spyOn(fs, 'writeFileSync')
-    .mockImplementation((path: string, value: string) => (tmp = value));
-};
-
-describe('getDefaults', () => {
-  it('return the expect defaults', () => {
-    expect(getDefaults()).toEqual({
-      dirPath: DEFAULT_PATH,
-      format: 'JSON',
-      keyPath: SSH_KEY_PATH,
-    } as CreatePreferencesOptions);
-  });
-  it('override expected defaults', () => {
-    expect(
-      getDefaults({
-        dirPath: 'a/b/c',
-        format: 'JSON',
-        keyPath: 'k/e/y',
-      })
-    ).toEqual({
-      dirPath: 'a/b/c',
-      format: 'JSON',
-      keyPath: 'k/e/y',
-    } as CreatePreferencesOptions);
+describe('exports', () => {
+  it('exports expected items', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const allExports = require('./index');
+    expect(allExports).toHaveProperty('Pref');
+    expect(allExports).toHaveProperty('getDefaultCrypto');
   });
 });
-describe('createPreference', () => {
-  it('getPreferences defaults to empty object', () => {
-    mockFS();
-    const { getPreferences } = createPreferences('com.example');
-    expect(getPreferences()).toEqual({});
+
+describe('singleton instance', () => {
+  it('Pref is a singleton instance', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const Pref2 = require('./index').Pref;
+    expect(Pref1).toBe(Pref2);
   });
-  it('getPreferences defaults to `default` object', () => {
-    mockFS();
-    const { getPreferences } = createPreferences('com.example', { a: 'a' });
-    expect(getPreferences()).toEqual({ a: 'a' });
+});
+
+describe('create instance', () => {
+  const encoder = (s: string) => s;
+  const decoder = (s: string) => s;
+  const SAFE_OPTIONS = {
+    name: 'com.example.test',
+    dirPath: './dir/path',
+    filename: 'test.pref',
+    encoder,
+    decoder,
+  };
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('reads and writes to disk', () => {
-    mockFS();
-    const { setPreferences, getPreferences } = createPreferences(
-      'com.example',
-      { a: 'a' },
-      { dirPath: 'a/b/c' }
-    );
-    setPreferences({
-      a: 'Hello, World!',
+  afterAll(() => {
+    jest.resetAllMocks();
+  });
+
+  const createMockExists = (hasFile = false) =>
+    jest.spyOn(io, 'existsOnDisk').mockImplementation(() => hasFile);
+  const createMockRead = <S>(s?: S) => {
+    const mock = jest.spyOn(io, 'readFromDisk');
+    return s
+      ? mock.mockImplementation(() => JSON.stringify(s))
+      : mock.mockImplementation();
+  };
+  const createMockWrite = () =>
+    jest.spyOn(io, 'writeToDisk').mockImplementation();
+
+  it('does not throw error', () => {
+    createMockExists();
+    createMockRead();
+    createMockWrite();
+    expect(() =>
+      createInstance({
+        defaults: { a: 'memory' },
+        ...SAFE_OPTIONS,
+      })
+    ).not.toThrow();
+  });
+
+  it('creates defaults and gets defaults but does not read or write', () => {
+    createMockExists();
+    const mockRead = createMockRead();
+    const mockWrite = createMockWrite();
+
+    const { get } = createInstance({
+      defaults: { a: 'a' },
+      ...SAFE_OPTIONS,
     });
-    expect(getPreferences()).toEqual({ a: 'Hello, World!' });
 
-    expect(fs.mkdirSync).toBeCalledTimes(1);
-    expect(fs.writeFileSync).toBeCalledTimes(1);
-    expect(fs.writeFileSync).toHaveBeenCalledWith(
-      'a/b/c/com.example.pref',
-      expect.any(String),
-      expect.anything()
-    );
-    expect(fs.readFileSync).toHaveBeenLastCalledWith(
-      'a/b/c/com.example.pref',
-      expect.anything()
+    expect(mockRead).not.toHaveBeenCalled();
+    expect(mockWrite).not.toHaveBeenCalled();
+
+    expect(get('a')).toBe('a');
+  });
+
+  it('reads and extends defaults', () => {
+    createMockExists(true);
+    const mockRead = createMockRead({ a: 'disk' });
+
+    const { get } = createInstance({
+      defaults: { a: 'default', b: 'b' },
+      ...SAFE_OPTIONS,
+    });
+
+    expect(mockRead).toHaveBeenCalled();
+
+    expect(get('a')).toBe('disk');
+  });
+
+  it("dose not write if state doesn't change", () => {
+    createMockExists();
+    createMockRead();
+    const mockWrite = createMockWrite();
+
+    const { set } = createInstance({
+      defaults: { a: 'a' },
+      ...SAFE_OPTIONS,
+    });
+
+    expect(mockWrite).not.toHaveBeenCalled();
+
+    set('a', 'a');
+
+    expect(mockWrite).not.toHaveBeenCalled();
+  });
+
+  it('writes once state has changed', () => {
+    createMockExists();
+    createMockRead();
+    const mockWrite = createMockWrite();
+
+    const { set } = createInstance({
+      defaults: { a: 'a' },
+      ...SAFE_OPTIONS,
+    });
+
+    expect(mockWrite).not.toHaveBeenCalled();
+
+    set('a', 'b');
+
+    expect(mockWrite).toHaveBeenCalledTimes(1);
+    expect(mockWrite).toHaveBeenCalledWith(
+      SAFE_OPTIONS.dirPath,
+      SAFE_OPTIONS.filename,
+      expect.any(String)
     );
   });
 
-  it('subscribe', () => {
-    const { setPreferences, subscribe } = createPreferences('com.example');
+  it('filePath exists and is overwritten', () => {
+    createMockExists();
+    createMockRead();
 
-    const mockObserver = jest.fn(() => ({}));
-    const mockHandler = subscribe(mockObserver);
+    const { filePath } = createInstance({
+      defaults: { a: 'a' },
+      ...SAFE_OPTIONS,
+    });
 
-    setPreferences({ a: 'a' });
-    mockHandler();
-    setPreferences({ a: 'b' });
+    expect(filePath).toBe(join(SAFE_OPTIONS.dirPath, SAFE_OPTIONS.filename));
+  });
 
-    expect(mockObserver).toBeCalledTimes(1);
-    expect(mockObserver).toBeCalledWith({ a: 'a' });
+  it('gets, sets, and resets key from state', () => {
+    createMockExists();
+    const mockRead = createMockRead();
+    const mockWrite = createMockWrite();
+
+    const { get, set, reset } = createInstance({
+      defaults: { a: 'default' },
+      ...SAFE_OPTIONS,
+    });
+
+    expect(mockRead).not.toHaveBeenCalled();
+    expect(mockWrite).not.toHaveBeenCalled();
+    expect(get('a')).toEqual('default');
+
+    set('a', 'disk');
+
+    expect(mockWrite).toHaveBeenCalledTimes(1);
+    expect(mockWrite).toHaveBeenCalledWith(
+      SAFE_OPTIONS.dirPath,
+      SAFE_OPTIONS.filename,
+      JSON.stringify({ a: 'disk' })
+    );
+    expect(get('a')).toEqual('disk');
+    expect(mockRead).not.toHaveBeenCalled();
+
+    reset('a');
+
+    expect(mockWrite).toHaveBeenCalledTimes(2);
+    expect(mockWrite).toHaveBeenCalledWith(
+      SAFE_OPTIONS.dirPath,
+      SAFE_OPTIONS.filename,
+      JSON.stringify({ a: 'default' })
+    );
+    expect(get('a')).toEqual('default');
+    expect(mockRead).not.toHaveBeenCalled();
+  });
+
+  it('never writes when equality is `false`', () => {
+    createMockExists();
+    createMockRead();
+    const mockWrite = createMockWrite();
+    const { set, reset } = createInstance({
+      defaults: { a: 'default' },
+      ...SAFE_OPTIONS,
+      equality: false,
+    });
+
+    set('a', 'b');
+    set('a', 'c');
+    set('a', 'd');
+    set('a', 'e');
+    reset('a');
+
+    expect(mockWrite).not.toBeCalled();
+  });
+
+  it('always writes when equality is `true`', () => {
+    createMockExists();
+    createMockRead();
+    const mockWrite = createMockWrite();
+    const { set, reset } = createInstance({
+      defaults: { a: 'default' },
+      ...SAFE_OPTIONS,
+      equality: true,
+    });
+
+    set('a', 'b');
+    set('a', 'c');
+    set('a', 'd');
+    set('a', 'e');
+    reset('a');
+
+    expect(mockWrite).toBeCalledTimes(5);
   });
 });

@@ -12,6 +12,7 @@ import { join } from 'path';
 
 export interface CryptoConfig {
   keyPath?: string;
+  defaultKey?: string;
 }
 
 export const INPUT_ENCODING: Utf8AsciiBinaryEncoding = 'utf8';
@@ -19,22 +20,18 @@ export const OUTPUT_ENCODING: HexBase64BinaryEncoding = 'hex';
 
 export const SSH_KEY_PATH = join(homedir(), '.ssh', 'id_rsa');
 
-export const CRYPTO_DEFAULTS: CryptoConfig = {
-  keyPath: SSH_KEY_PATH,
-};
-
-const readKey = (keyPath?: string) =>
+const readKey = (keyPath: string) =>
   existsSync(keyPath) && readFileSync(keyPath).toString(INPUT_ENCODING);
 
-export const getKey = (keyPath?: string) =>
-  readKey(keyPath) || readKey(SSH_KEY_PATH) || 'PREF';
+export const getKey = ({ keyPath, defaultKey = 'PREF' }: CryptoConfig = {}) =>
+  readKey(keyPath) || readKey(SSH_KEY_PATH) || defaultKey;
 
-export const createCrypto = ({ keyPath }: CryptoConfig = {}) => {
-  const key = getKey(keyPath);
+export const getDefaultCrypto = (config: CryptoConfig = {}) => {
+  const key = getKey(config);
 
   const encryptedKey = createHash('sha256').update(key).digest();
 
-  const encode = (text: string): string => {
+  const encoder = (text: string): string => {
     const iv = randomBytes(8).toString(OUTPUT_ENCODING);
     const cipher = createCipheriv('aes256', encryptedKey, iv);
     const encrypted =
@@ -43,7 +40,7 @@ export const createCrypto = ({ keyPath }: CryptoConfig = {}) => {
     return `${iv.toString()}:${encrypted.toString()}`;
   };
 
-  const decode = (text: string): string => {
+  const decoder = (text: string): string => {
     const [ivString, encrypted] = text.split(':');
     const decipher = createDecipheriv('aes256', encryptedKey, ivString);
     return (
@@ -53,7 +50,7 @@ export const createCrypto = ({ keyPath }: CryptoConfig = {}) => {
   };
 
   return {
-    encode,
-    decode,
+    encoder,
+    decoder,
   };
 };
