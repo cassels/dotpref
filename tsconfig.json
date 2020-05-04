@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "declaration": true,
-    "target": "ES5",
-    "lib": ["ES5", "ES6"],
-    "noUnusedLocals": false,
+    "lib": ["ES2017"],
     "module": "CommonJS",
+    "target": "ES2017",
+    "declaration": true,
+    "noUnusedLocals": false,
     "noImplicitAny": true,
     "removeComments": true,
     "moduleResolution": "Node",
