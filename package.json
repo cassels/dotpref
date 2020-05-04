@@ -1,7 +1,7 @@
 {
   "name": "dotpref",
   "version": "0.0.0-development",
-  "description": "Manage CLI application encrypted preferences in a stateful way.",
+  "description": "Perfect for CLI application user preferences.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
@@ -38,5 +38,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/cassels/dotpref.git"
-  }
+  },
+  "files": [
+    "lib",
+    "yarn.lock"
+  ]
 }
