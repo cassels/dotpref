@@ -40,7 +40,6 @@
     "url": "https://github.com/cassels/dotpref.git"
   },
   "files": [
-    "lib",
-    "yarn.lock"
+    "lib"
   ]
 }
