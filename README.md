@@ -1,10 +1,12 @@
-# .pref
+# .pref (beta)
 
 > Perfect for CLI application user preferences
 
-Out of the 📦⤵️ easy application encrypted preferences 👍 customize when necessary 🎨⚙️.
+Out of the box 📦⤵️ easy application encrypted preferences 👍
 
 ---
+
+**_This is a beta release so the API could change without warning._**
 
 ## Highlights
 
