@@ -11,7 +11,7 @@
     "build": "yarn clean && tsc",
     "build:watch": "tsc --watch ",
     "clean": "rm -rf lib",
-    "semantic-release": "semantic-release --dry-run"
+    "semantic-release": "semantic-release"
   },
   "devDependencies": {
     "@types/jest": "^25.2.1",
