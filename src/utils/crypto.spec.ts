@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { createCrypto, getKey, SSH_KEY_PATH } from './crypto';
+import { getDefaultCrypto, getKey, SSH_KEY_PATH } from './crypto';
 
 describe('crypto', () => {
   afterAll(() => {
@@ -33,27 +33,34 @@ describe('crypto', () => {
       );
   };
 
-  it('encode & decode with .ssh key', () => {
-    const { encode, decode } = createCrypto();
+  it('encoder & decoder with .ssh key', () => {
+    const { encoder, decoder } = getDefaultCrypto();
 
-    expect(decode(encode(STR))).toBe(STR);
+    expect(decoder(encoder(STR))).toBe(STR);
   });
 
-  it('encode & decode with keyPath', () => {
+  it('encoder & decoder with keyPath', () => {
     mockFS({
       [KEY_PATH_MOCK]: KEY_VALUE_MOCK,
     });
-    const { encode, decode } = createCrypto({ keyPath: KEY_PATH_MOCK });
+    const { encoder, decoder } = getDefaultCrypto({ keyPath: KEY_PATH_MOCK });
 
-    expect(decode(encode(STR))).toBe(STR);
+    expect(decoder(encoder(STR))).toBe(STR);
   });
 
   describe('getKey', () => {
-    it('w/o keyPath and w/o .ssh returns `PERF`', () => {
+    it('w/o keyPath and w/o .ssh and w/o `defaultKey` returns `PERF`', () => {
       mockFS({
         [SSH_KEY_PATH]: false,
       });
       expect(getKey()).toBe('PREF');
+    });
+
+    it('w/o keyPath and w/o .ssh returns `defaultKey`', () => {
+      mockFS({
+        [SSH_KEY_PATH]: false,
+      });
+      expect(getKey({ defaultKey: 'TEST' })).toBe('TEST');
     });
 
     it('w/o keyPath and with .ssh returns .ssh', () => {
@@ -70,12 +77,12 @@ describe('crypto', () => {
       });
       expect(getKey()).toBe(SSH_MOCK_VALUE);
     });
-    it('with valid keyPath and with .ssh returns .ssh', () => {
+    it('with valid keyPath and with .ssh returns key', () => {
       mockFS({
         [SSH_KEY_PATH]: SSH_MOCK_VALUE,
         [KEY_PATH_MOCK]: KEY_VALUE_MOCK,
       });
-      expect(getKey(KEY_PATH_MOCK)).toBe(KEY_VALUE_MOCK);
+      expect(getKey({ keyPath: KEY_PATH_MOCK })).toBe(KEY_VALUE_MOCK);
     });
   });
 });
