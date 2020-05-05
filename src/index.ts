@@ -1,6 +1,6 @@
 import { dirname, join } from 'path';
-import { AnyState, DotPrefOptions } from './types';
-import { existsOnDisk, readFromDisk, writeToDisk } from './utils/io';
+import { AnyState, DotPref, DotPrefOptions } from './types';
+import { readFromDisk, writeToDisk } from './utils/io';
 import { getOptions } from './utils/options';
 import { PartialPick } from './utils/types';
 import { getPackageData, normalizeId, shouldWrite } from './utils/utils';
@@ -22,20 +22,40 @@ const getModuleParentDir = () => {
   return dirname((module.parent && module.parent.filename) || '.');
 };
 
+let instance: DotPref<AnyState>;
+const getInstance = (): DotPref<AnyState> => {
+  if (!instance) {
+    instance = createPref<AnyState>({
+      defaults: {},
+    });
+  }
+  return instance;
+};
+
 /**
  * Default instance of .pref
  */
-export const Pref = createInstance<AnyState>({
-  defaults: {},
+export const Pref: DotPref<AnyState> = {
+  get: key => getInstance().get(key),
+  set: (key, value) => getInstance().set(key, value),
+  reset: key => getInstance().reset(key),
+  read: () => getInstance().read(),
+  write: () => getInstance().write(),
+  filePath: '',
+};
+
+Object.defineProperty(Pref, 'filePath', {
+  enumerable: true,
+  get: () => getInstance().filePath,
 });
 
 /**
  * Create custom instance of .pref.
  */
-export function createInstance<S extends AnyState>({
+export function createPref<S extends AnyState>({
   name,
   ...options
-}: PartialPick<DotPrefOptions<S>, 'defaults'>) {
+}: PartialPick<DotPrefOptions<S>, 'defaults'>): DotPref<S> {
   const parentPackageData = getPackageData(getModuleParentDir());
   const defaultName = parentPackageData.name;
 
@@ -71,12 +91,12 @@ export function createInstance<S extends AnyState>({
   };
 
   const read = () => {
-    if (existsOnDisk(dirPath, filename)) {
+    try {
       const encryptedData = readFromDisk(dirPath, filename);
       const serializedData = decoder(encryptedData);
       state = { ...defaults, ...deserializer(serializedData) };
       // TODO: notify READ
-    } else {
+    } catch (e) {
       state = { ...defaults };
     }
   };
