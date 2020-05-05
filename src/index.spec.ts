@@ -1,6 +1,18 @@
 import { join } from 'path';
-import { createInstance, Pref as Pref1 } from './index';
+import { createPref, Pref } from './index';
 import * as io from './utils/io';
+
+const mockRead = jest.spyOn(io, 'readFromDisk').mockImplementation();
+const mockWrite = jest.spyOn(io, 'writeToDisk').mockImplementation();
+
+afterAll(() => {
+  jest.restoreAllMocks();
+});
+
+beforeEach(() => {
+  mockRead.mockImplementation();
+  mockWrite.mockImplementation();
+});
 
 describe('exports', () => {
   it('exports expected items', () => {
@@ -12,10 +24,59 @@ describe('exports', () => {
 });
 
 describe('singleton instance', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('Pref is a singleton instance', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const Pref2 = require('./index').Pref;
-    expect(Pref1).toBe(Pref2);
+    expect(Pref).toBe(Pref2);
+  });
+
+  it('sets, gets, resets', () => {
+    expect(Pref.get('foo')).toBe(undefined);
+
+    Pref.set('foo', 'bar');
+    expect(mockWrite).toHaveBeenLastCalledWith(
+      Pref.filePath.replace('/config.pref', ''),
+      'config.pref',
+      expect.any(String)
+    );
+
+    expect(Pref.get('foo')).toBe('bar');
+
+    Pref.reset('foo');
+    expect(mockWrite).toHaveBeenLastCalledWith(
+      Pref.filePath.replace('/config.pref', ''),
+      'config.pref',
+      expect.any(String)
+    );
+
+    expect(Pref.get('foo')).toBe(undefined);
+
+    expect(mockWrite).toBeCalledTimes(2);
+    expect(mockRead).toBeCalledTimes(1);
+  });
+
+  it('writes, reads', () => {
+    let file: string;
+    mockWrite.mockImplementation((dir, name, text) => {
+      file = text;
+    });
+
+    Pref.write();
+    expect(mockWrite).toBeCalledTimes(1);
+    expect(mockWrite).toBeCalledWith(
+      Pref.filePath.replace('/config.pref', ''),
+      'config.pref',
+      expect.any(String)
+    );
+
+    mockRead.mockReturnValueOnce(file);
+    Pref.read();
+    expect(mockRead).toBeCalledTimes(1);
+    expect(mockRead).toReturnWith(expect.any(String));
   });
 });
 
@@ -30,58 +91,52 @@ describe('create instance', () => {
     decoder,
   };
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  afterAll(() => {
-    jest.resetAllMocks();
-  });
-
-  const createMockExists = (hasFile = false) =>
-    jest.spyOn(io, 'existsOnDisk').mockImplementation(() => hasFile);
-  const createMockRead = <S>(s?: S) => {
-    const mock = jest.spyOn(io, 'readFromDisk');
-    return s
-      ? mock.mockImplementation(() => JSON.stringify(s))
-      : mock.mockImplementation();
-  };
-  const createMockWrite = () =>
-    jest.spyOn(io, 'writeToDisk').mockImplementation();
-
   it('does not throw error', () => {
-    createMockExists();
-    createMockRead();
-    createMockWrite();
     expect(() =>
-      createInstance({
+      createPref({
         defaults: { a: 'memory' },
         ...SAFE_OPTIONS,
       })
     ).not.toThrow();
   });
 
-  it('creates defaults and gets defaults but does not read or write', () => {
-    createMockExists();
-    const mockRead = createMockRead();
-    const mockWrite = createMockWrite();
-
-    const { get } = createInstance({
+  it('creates defaults and gets defaults', () => {
+    mockRead.mockImplementationOnce(() => {
+      throw new Error();
+    });
+    const { get } = createPref({
       defaults: { a: 'a' },
       ...SAFE_OPTIONS,
     });
 
-    expect(mockRead).not.toHaveBeenCalled();
+    expect(mockRead).toHaveBeenCalledTimes(1);
+    expect(mockRead).not.toReturn();
+    expect(mockWrite).not.toHaveBeenCalled();
+
+    expect(get('a')).toBe('a');
+  });
+
+  it('falls back on defaults if error', () => {
+    mockRead.mockReturnValueOnce('not encrypted text');
+
+    const { get } = createPref({
+      defaults: { a: 'a' },
+      ...SAFE_OPTIONS,
+    });
+    expect(mockRead).toHaveBeenCalled();
     expect(mockWrite).not.toHaveBeenCalled();
 
     expect(get('a')).toBe('a');
   });
 
   it('reads and extends defaults', () => {
-    createMockExists(true);
-    const mockRead = createMockRead({ a: 'disk' });
+    mockRead.mockReturnValueOnce(JSON.stringify({ a: 'disk' }));
 
-    const { get } = createInstance({
+    const { get } = createPref({
       defaults: { a: 'default', b: 'b' },
       ...SAFE_OPTIONS,
     });
@@ -92,11 +147,7 @@ describe('create instance', () => {
   });
 
   it("dose not write if state doesn't change", () => {
-    createMockExists();
-    createMockRead();
-    const mockWrite = createMockWrite();
-
-    const { set } = createInstance({
+    const { set } = createPref({
       defaults: { a: 'a' },
       ...SAFE_OPTIONS,
     });
@@ -109,11 +160,7 @@ describe('create instance', () => {
   });
 
   it('writes once state has changed', () => {
-    createMockExists();
-    createMockRead();
-    const mockWrite = createMockWrite();
-
-    const { set } = createInstance({
+    const { set } = createPref({
       defaults: { a: 'a' },
       ...SAFE_OPTIONS,
     });
@@ -131,10 +178,7 @@ describe('create instance', () => {
   });
 
   it('filePath exists and is overwritten', () => {
-    createMockExists();
-    createMockRead();
-
-    const { filePath } = createInstance({
+    const { filePath } = createPref({
       defaults: { a: 'a' },
       ...SAFE_OPTIONS,
     });
@@ -143,16 +187,12 @@ describe('create instance', () => {
   });
 
   it('gets, sets, and resets key from state', () => {
-    createMockExists();
-    const mockRead = createMockRead();
-    const mockWrite = createMockWrite();
-
-    const { get, set, reset } = createInstance({
+    const { get, set, reset } = createPref({
       defaults: { a: 'default' },
       ...SAFE_OPTIONS,
     });
 
-    expect(mockRead).not.toHaveBeenCalled();
+    expect(mockRead).toHaveBeenCalledTimes(1);
     expect(mockWrite).not.toHaveBeenCalled();
     expect(get('a')).toEqual('default');
 
@@ -165,7 +205,7 @@ describe('create instance', () => {
       JSON.stringify({ a: 'disk' })
     );
     expect(get('a')).toEqual('disk');
-    expect(mockRead).not.toHaveBeenCalled();
+    expect(mockRead).toHaveBeenCalledTimes(1);
 
     reset('a');
 
@@ -176,14 +216,11 @@ describe('create instance', () => {
       JSON.stringify({ a: 'default' })
     );
     expect(get('a')).toEqual('default');
-    expect(mockRead).not.toHaveBeenCalled();
+    expect(mockRead).toHaveBeenCalledTimes(1);
   });
 
   it('never writes when equality is `false`', () => {
-    createMockExists();
-    createMockRead();
-    const mockWrite = createMockWrite();
-    const { set, reset } = createInstance({
+    const { set, reset } = createPref({
       defaults: { a: 'default' },
       ...SAFE_OPTIONS,
       equality: false,
@@ -199,10 +236,7 @@ describe('create instance', () => {
   });
 
   it('always writes when equality is `true`', () => {
-    createMockExists();
-    createMockRead();
-    const mockWrite = createMockWrite();
-    const { set, reset } = createInstance({
+    const { set, reset } = createPref({
       defaults: { a: 'default' },
       ...SAFE_OPTIONS,
       equality: true,

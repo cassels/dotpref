@@ -60,12 +60,12 @@ The default export of the `dotpref` module is a singleton [instance](#Instance) 
 import Pref from 'dotpref';
 ```
 
-#### `createInstance`
+#### `createPref`
 
 Creates a custom [instance](#Instance) of dotpref with custom configuration. This method can be used if you need multiple configurations.
 
 ```js
-import { createInstance } from 'dotpref';
+import { createPref } from 'dotpref';
 ```
 
 #### Instance
