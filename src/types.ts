@@ -36,3 +36,12 @@ export interface DotPrefOptions<S extends AnyState> {
   // TODO: `watch`;
   // watch: boolean;
 }
+
+export interface DotPref<S extends AnyState> {
+  get: <K extends keyof S>(key: K) => S[K];
+  set: <K extends keyof S>(key: K, value: S[K]) => void;
+  reset: <K extends keyof S>(key: K) => void;
+  read: () => void;
+  write: () => void;
+  filePath: string;
+}
