@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as atomic from 'write-file-atomic';
-import { existsOnDisk, readFromDisk, writeToDisk } from './io';
+import { readFromDisk, writeToDisk } from './io';
 
 describe('io', () => {
   afterEach(() => {
@@ -14,11 +14,6 @@ describe('io', () => {
   it('reads from file', () => {
     jest.spyOn(fs, 'readFileSync').mockImplementation(() => 'test contents');
     expect(readFromDisk('./tmp', 'test')).toBe('test contents');
-  });
-
-  it('checks existence of file', () => {
-    jest.spyOn(fs, 'existsSync').mockImplementation(() => true);
-    expect(existsOnDisk('./tmp', 'test')).toBe(true);
   });
 
   it('writes to file', () => {
