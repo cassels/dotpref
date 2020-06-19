@@ -1,8 +1,2 @@
 branches:
   - master
-  - next
-  - release/*
-  - name: 'beta'
-    prerelease: true
-  - name: 'alpha'
-    prerelease: true
