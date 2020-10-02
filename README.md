@@ -1,4 +1,4 @@
-# .pref (beta)
+# .pref
 
 > Perfect for CLI application user preferences
 
