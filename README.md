@@ -4,9 +4,9 @@
 
 Out of the box 📦⤵️ easy application encrypted preferences 👍
 
-![npm version](https://img.shields.io/npm/v/dotpref?style=flat-square)
-![npm license](https://img.shields.io/npm/l/dotpref?style=flat-square)
-![npm downloads](https://img.shields.io/npm/dt/dotpref?style=flat-square)
+[![npm version](https://img.shields.io/npm/v/dotpref?style=flat-square)](https://www.npmjs.com/package/dotpref)
+[![npm license](https://img.shields.io/npm/l/dotpref?style=flat-square)](https://github.com/cassels/dotpref)
+[![npm downloads](https://img.shields.io/npm/dt/dotpref?style=flat-square)](https://www.npmjs.com/package/dotpref)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 ![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/cassels/dotpref?style=flat-square)
 [![dependencies Status](https://david-dm.org/cassels/dotpref/status.svg?style=flat-square)](https://david-dm.org/cassels/dotpref)
