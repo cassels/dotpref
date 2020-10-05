@@ -4,6 +4,7 @@
   "description": "Perfect for CLI application user preferences.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "author": "Graeme Cassels (https://github.com/cassels)",
   "license": "MIT",
   "scripts": {
     "test": "jest",
@@ -13,6 +14,28 @@
     "clean": "rm -rf lib",
     "semantic-release": "semantic-release"
   },
+  "keywords": [
+		"pref",
+		"prefs",
+		"preferences",
+		"conf",
+		"config",
+		"configuration",
+		"store",
+		"storage",
+    "settings",
+    "secure",
+		"cli",
+		"data",
+    "encrypted",
+		"persist",
+		"persistent",
+		"save",
+		"load",
+		"read",
+		"write",
+		"cache"
+	],
   "devDependencies": {
     "@types/jest": "^26.0.5",
     "@types/node": "^14.11.2",
@@ -39,6 +62,9 @@
     "type": "git",
     "url": "https://github.com/cassels/dotpref.git"
   },
+  "contributors": [
+    "Graeme Cassels (https://github.com/cassels)"
+  ],
   "files": [
     "lib"
   ]
