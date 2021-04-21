@@ -2,9 +2,7 @@ import {
   createCipheriv,
   createDecipheriv,
   createHash,
-  HexBase64BinaryEncoding,
   randomBytes,
-  Utf8AsciiBinaryEncoding,
 } from 'crypto';
 import { existsSync, readFileSync } from 'fs';
 import { homedir } from 'os';
@@ -15,8 +13,8 @@ export interface CryptoConfig {
   defaultKey?: string;
 }
 
-export const INPUT_ENCODING: Utf8AsciiBinaryEncoding = 'utf8';
-export const OUTPUT_ENCODING: HexBase64BinaryEncoding = 'hex';
+export const INPUT_ENCODING = 'utf8';
+export const OUTPUT_ENCODING = 'hex';
 
 export const SSH_KEY_PATH = join(homedir(), '.ssh', 'id_rsa');
 
