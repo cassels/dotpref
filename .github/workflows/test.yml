@@ -53,7 +53,7 @@ jobs:
     needs: [build]
     strategy:
       matrix:
-        node: ['8', '10', '12', '14']
+        node: ['10', '12', '14']
     name: Integration Test on Node ${{ matrix.node }}
     steps:
       - name: Setup node
