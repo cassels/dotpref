@@ -38,7 +38,7 @@
   ],
   "devDependencies": {
     "@types/jest": "^26.0.5",
-    "@types/node": "^14.11.2",
+    "@types/node": "^15.0.2",
     "@types/onetime": "^4.0.0",
     "@types/pkg-up": "^3.1.0",
     "@types/write-file-atomic": "^3.0.1",
