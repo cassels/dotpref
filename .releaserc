@@ -6,6 +6,9 @@ plugins:
     - type: docs
       scope: README
       release: patch
+    - type: chore
+      scope: deps
+      release: patch
 - "@semantic-release/release-notes-generator"
 - "@semantic-release/npm"
 - "@semantic-release/github"
