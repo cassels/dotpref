@@ -1540,12 +1540,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/write-file-atomic@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "@types/write-file-atomic@npm:3.0.1"
+"@types/write-file-atomic@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "@types/write-file-atomic@npm:3.0.2"
   dependencies:
     "@types/node": "*"
-  checksum: 1a4d10818064decea5de676108888a153e308b3246065094797f79529aa09fe47feb62296b7a08dbc1783e53e89e6530dab35b8cf15f5815b563527a27b0e216
+  checksum: 35268685a58a9f905fbc1d2074cc6195ef01149ce5584bb90df95abd077eabd1f3e24ee515e2d9f28f654934d006072a122c3a7169880aecd6946e79986f37e1
   languageName: node
   linkType: hard
 
@@ -2937,7 +2937,7 @@ __metadata:
     "@types/node": ^16.10.1
     "@types/onetime": ^4.0.0
     "@types/pkg-up": ^3.1.0
-    "@types/write-file-atomic": ^3.0.1
+    "@types/write-file-atomic": ^3.0.2
     "@typescript-eslint/eslint-plugin": ^4.32.0
     "@typescript-eslint/parser": ^4.32.0
     eslint: ^7.32.0
@@ -2949,7 +2949,7 @@ __metadata:
     prettier: ^2.4.1
     semantic-release: ^17.1.2
     ts-jest: ^27.0.5
-    typescript: ^4.0.3
+    typescript: ^4.4.3
     write-file-atomic: ^3.0.3
   languageName: unknown
   linkType: soft
@@ -7769,23 +7769,23 @@ fsevents@^2.3.2:
   languageName: node
   linkType: hard
 
-typescript@^4.0.3:
-  version: 4.2.4
-  resolution: "typescript@npm:4.2.4"
+typescript@^4.4.3:
+  version: 4.4.3
+  resolution: "typescript@npm:4.4.3"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 89c397df192f239359ad798b96d8e8d552e12c0c189ac5676cec4c20c410d6eec636b8e59a88f2aef0a56d961a9678d99c400099be9b7cae2f7b062eb4b7b171
+  checksum: 05823f21796d450531a7e4ab299715d38fd9ded0e4ce7400876053f4b5166ca3dde7a68cecfe72d9086039f03c0b6edba36516fb10ed83c5837d9600532ea4c2
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.0.3#~builtin<compat/typescript>":
-  version: 4.2.4
-  resolution: "typescript@patch:typescript@npm%3A4.2.4#~builtin<compat/typescript>::version=4.2.4&hash=32657b"
+"typescript@patch:typescript@^4.4.3#~builtin<compat/typescript>":
+  version: 4.4.3
+  resolution: "typescript@patch:typescript@npm%3A4.4.3#~builtin<compat/typescript>::version=4.4.3&hash=32657b"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 91772e5fc70895a8f645837cb91d14af95a11b173043ed0dcf12c1069f9dcf5c3c82bc7212c217c9a2cb488900dd2cda3f40f543bed5d149428df13c90c10098
+  checksum: 28ab98313afab46788ff41014fdb5932430ada6e03cf9e92ac47f406526a2cac1ae2894834e7da61e46b7429318e9c47f45ba8de323332f0cb9af99b72ebae74
   languageName: node
   linkType: hard
 
