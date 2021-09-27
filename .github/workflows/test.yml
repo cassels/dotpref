@@ -1,7 +1,7 @@
 # Build and test when pull request is made to protected branches.
 # This workflow will run integration tests against multiple versions of Node.
 
-name: Build & Test
+name: Lint/Test/Build
 
 on:
   pull_request:
@@ -16,8 +16,8 @@ jobs:
   build:
     strategy:
       matrix:
-        node: ['10', '12', '14']
-    name: Lint/Test/Build on Node ${{ matrix.node }}
+        node: ['10', '12', '14', '16']
+    name: on Node ${{ matrix.node }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
