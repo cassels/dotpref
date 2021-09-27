@@ -1,7 +1,7 @@
 # Build and test when pull request is made to protected branches.
 # This workflow will run integration tests against multiple versions of Node.
 
-name: Continuous Integration
+name: CI
 
 on:
   pull_request:
@@ -16,7 +16,7 @@ jobs:
   lint:
     strategy:
       matrix:
-        node: ['10', '12', '14', '16']
+        node: ['16']
     name: Lint on Node ${{ matrix.node }}
     runs-on: ubuntu-latest
     steps:
