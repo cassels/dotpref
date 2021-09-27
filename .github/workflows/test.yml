@@ -16,7 +16,7 @@ jobs:
   lint:
     strategy:
       matrix:
-        node: ['16']
+        node: ['10', '12', '14', '16']
     name: Lint on Node ${{ matrix.node }}
     runs-on: ubuntu-latest
     steps:
@@ -60,9 +60,3 @@ jobs:
 
       - name: Build
         run: yarn build
-
-      - name: Upload 'lib' artifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: lib
-          path: lib
