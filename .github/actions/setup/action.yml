@@ -5,11 +5,13 @@ runs:
   using: 'composite'
   steps:
     - name: Get yarn cache directory path
+      shell: bash
       id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(yarn cache dir)"
 
     - name: Cache node_modules
       uses: actions/cache@v1
+      shell: bash
       id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
       with:
         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -18,4 +20,5 @@ runs:
           ${{ runner.os }}-yarn-
 
     - name: Install Dependencies
+      shell: bash
       run: yarn install --immutable
