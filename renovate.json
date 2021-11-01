@@ -2,7 +2,6 @@
   "extends": [
     ":ignoreUnstable",
     ":updateNotScheduled",
-    ":prHourlyLimit4",
     ":automergeDisabled",
     ":preserveSemverRanges",
     "schedule:earlyMondays",
