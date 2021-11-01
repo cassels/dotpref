@@ -22,7 +22,7 @@ jobs:
       - name: Setup
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 'lts/*'
           cache: 'yarn'
 
       - run: yarn install
@@ -47,7 +47,7 @@ jobs:
       - name: Setup
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 'lts/*'
           cache: 'yarn'
 
       - run: yarn install
