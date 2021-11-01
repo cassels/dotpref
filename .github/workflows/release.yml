@@ -31,7 +31,7 @@ jobs:
         run: yarn build
 
       - name: Upload 'lib' artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: lib
           path: lib
