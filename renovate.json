@@ -1,5 +1,30 @@
 {
   "extends": [
-    "config:base"
+    ":ignoreUnstable",
+    ":updateNotScheduled",
+    ":prHourlyLimit4",
+    ":automergeDisabled",
+    ":preserveSemverRanges",
+    "schedule:earlyMondays",
+    "group:monorepos",
+    "group:recommended",
+    "workarounds:all"
+  ],
+  "packageRules": [
+    {
+      "matchPackagePatterns": [
+        "*"
+      ],
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "deps-dev"
+    },
+    {
+      "matchDepTypes": [
+        "dependencies",
+        "require"
+      ],
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "deps"
+    }
   ]
 }
