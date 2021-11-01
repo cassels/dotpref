@@ -6,7 +6,7 @@
     ":automergeDisabled",
     ":preserveSemverRanges",
     "schedule:earlyMondays",
-    ":label(dependencies)"
+    ":label(dependencies)",
     "group:monorepos",
     "group:recommended",
     "workarounds:all"
