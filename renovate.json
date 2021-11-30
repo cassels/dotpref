@@ -4,11 +4,14 @@
     ":updateNotScheduled",
     ":automergeDisabled",
     ":preserveSemverRanges",
-    "schedule:earlyMondays",
+    ":npm",
     ":label(dependencies)",
+    ":prHourlyLimitNone",
+    ":prConcurrentLimitNone",
     "group:monorepos",
     "group:recommended",
-    "workarounds:all"
+    "workarounds:all",
+    "npm:unpublishSafe"
   ],
   "packageRules": [
     {
