@@ -11,6 +11,8 @@
     ":prConcurrentLimitNone",
     "group:monorepos",
     "group:recommended",
+    "group:linters",
+    "group:testNonMajor",
     "workarounds:all",
     "npm:unpublishSafe"
   ],
@@ -30,6 +32,12 @@
       ],
       "semanticCommitType": "chore",
       "semanticCommitScope": "deps"
+    },
+    {
+      "matchDepTypes": [
+        "engines"
+      ],
+      "enabled": false
     }
   ]
 }
