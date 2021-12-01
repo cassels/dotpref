@@ -60,7 +60,7 @@
     "write-file-atomic": "^3.0.3"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=v10.24.1"
   },
   "repository": {
     "type": "git",
