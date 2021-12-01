@@ -4,9 +4,9 @@
     ":ignoreUnstable",
     ":updateNotScheduled",
     ":automergeDisabled",
-    ":preserveSemverRanges",
     ":npm",
     ":label(dependencies)",
+    ":enableVulnerabilityAlertsWithLabel(security)",
     ":prHourlyLimitNone",
     ":prConcurrentLimitNone",
     "group:monorepos",
@@ -14,6 +14,7 @@
     "workarounds:all",
     "npm:unpublishSafe"
   ],
+  "rangeStrategy": "bump",
   "packageRules": [
     {
       "matchPackagePatterns": [
