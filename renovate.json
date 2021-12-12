@@ -3,7 +3,7 @@
     ":dependencyDashboard",
     ":ignoreUnstable",
     ":updateNotScheduled",
-    ":automergeDisabled",
+    ":automergeMinor",
     ":npm",
     ":label(dependencies)",
     ":enableVulnerabilityAlertsWithLabel(security)",
