@@ -1558,12 +1558,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/write-file-atomic@npm:^3.0.2":
-  version: 3.0.2
-  resolution: "@types/write-file-atomic@npm:3.0.2"
+"@types/write-file-atomic@npm:^3.0.3":
+  version: 3.0.3
+  resolution: "@types/write-file-atomic@npm:3.0.3"
   dependencies:
     "@types/node": "*"
-  checksum: 35268685a58a9f905fbc1d2074cc6195ef01149ce5584bb90df95abd077eabd1f3e24ee515e2d9f28f654934d006072a122c3a7169880aecd6946e79986f37e1
+  checksum: 11dc5f02b219bf35eacf267f48478c086e4d0aa7851ba435d815e4c42472ff0b4e6fd640203bad052ce05e32137a649f9356a2636456c2ba887f96a841b0e20c
   languageName: node
   linkType: hard
 
@@ -2974,7 +2974,7 @@ __metadata:
     "@types/node": ^16.11.17
     "@types/onetime": ^4.0.0
     "@types/pkg-up": ^3.1.0
-    "@types/write-file-atomic": ^3.0.2
+    "@types/write-file-atomic": ^3.0.3
     "@typescript-eslint/eslint-plugin": ^5.8.0
     "@typescript-eslint/parser": ^5.8.0
     eslint: ^8.5.0
