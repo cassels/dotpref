@@ -13,7 +13,7 @@
     "build": "yarn clean && tsc",
     "build:watch": "tsc --watch ",
     "clean": "rm -rf lib",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release --dry-run=$SEMANTIC_RELEASE_DRYRUN"
   },
   "keywords": [
     "pref",
