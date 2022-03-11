@@ -56,17 +56,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: lib
-      
-      - name: Release check
-        uses: dothq/file-or-directory-exists@latest
+
+      - name: Check Files
+        uses: JJ/files-present-action@releases/v1
         with:
-          input: |
-            package.json
-            LICENSE
-            README.md
-            lib
-            lib/index.js
-            lib/index.d.ts
+          files: 'package.json, LICENSE, README.md, lib, lib/index.js, lib/index.d.ts'
 
       - name: Release
         run: yarn semantic-release
