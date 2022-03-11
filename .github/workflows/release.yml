@@ -56,6 +56,17 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: lib
+      
+      - name: Release check
+        uses: dothq/file-or-directory-exists@latest
+        with:
+          input: |
+            package.json
+            LICENSE
+            README.md
+            lib
+            lib/index.js
+            lib/index.d.ts
 
       - name: Release
         run: yarn semantic-release
