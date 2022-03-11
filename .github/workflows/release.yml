@@ -53,7 +53,7 @@ jobs:
       - run: yarn install
 
       - name: Download lib
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v2
         with:
           name: lib
 
