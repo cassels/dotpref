@@ -75,3 +75,9 @@ jobs:
 
       - name: Build
         run: yarn build
+        
+      - name: Check Files  
+        uses: JJ/files-present-action@releases/v1
+        with:
+          files: "package.json, LICENSE, README.md, lib, lib/index.js, lib/index.d.ts"
+
