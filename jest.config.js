@@ -15,7 +15,6 @@ module.exports = {
       lines: 90,
     },
   },
-  testEnvironment: 'jsdom',
   testMatch: [
     '**/__tests__/**/?(*.)+(spec|test).[jt]s?(x)',
     '**/?(*.)+(spec|test).[jt]s?(x)',
